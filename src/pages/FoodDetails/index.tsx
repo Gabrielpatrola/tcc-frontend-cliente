@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useMemo,
   useLayoutEffect,
+  useContext,
 } from 'react';
 import { Image, Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
@@ -27,12 +28,8 @@ import {
   FoodContent,
   FoodTitle,
   FoodPricing,
-  AdditionalsContainer,
   Title,
   TotalContainer,
-  AdittionalItem,
-  AdittionalItemText,
-  AdittionalQuantity,
   PriceButtonContainer,
   TotalPrice,
   QuantityContainer,
@@ -40,6 +37,9 @@ import {
   ButtonText,
   IconContainer,
 } from './styles';
+
+import { addToCart } from '../../utils/FirestoreUtil';
+import { AuthContext } from '../../routes/AuthProvider';
 
 interface Params {
   id: undefined | string;
@@ -68,6 +68,7 @@ const FoodDetails: React.FC = () => {
 
   const navigation = useNavigation();
   const route = useRoute();
+  const { user } = useContext(AuthContext);
 
   const routeParams = route.params as Params;
 
@@ -98,6 +99,17 @@ const FoodDetails: React.FC = () => {
     loadFood();
   }, [routeParams]);
 
+  const handlePress = async () => {
+    /*     setLoading(true); */
+    try {
+      await addToCart(user, food.id as number);
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Something went wrong');
+    }
+    /*     setLoading(false); */
+  };
+
   function handleIncrementFood(): void {
     setFoodQuantity(foodQuantity + 1);
   }
@@ -106,7 +118,7 @@ const FoodDetails: React.FC = () => {
     setFoodQuantity(foodQuantity > 1 ? foodQuantity - 1 : 1);
   }
 
-  const toggleFavorite = useCallback(() => {
+  /*   const toggleFavorite = useCallback(() => {
     if (isFavorite) {
       api.delete(`/favorites/${food.id}`);
     } else {
@@ -116,7 +128,7 @@ const FoodDetails: React.FC = () => {
     }
 
     setIsFavorite(!isFavorite);
-  }, [isFavorite, food]);
+  }, [isFavorite, food]); */
 
   const cartTotal = useMemo(() => {
     const foodPrice = food.value * foodQuantity;
@@ -124,14 +136,14 @@ const FoodDetails: React.FC = () => {
     return formatValue(foodPrice);
   }, [food, foodQuantity]);
 
-  async function handleFinishOrder(): Promise<void> {
+  /*   async function handleFinishOrder(): Promise<void> {
     const newOrder = { ...food, product_id: food.id };
     delete newOrder.id;
 
     await api.post('/orders', newOrder);
 
     navigation.goBack();
-  }
+  } */
 
   // Calculate the correct icon name
   const favoriteIconName = useMemo(
@@ -151,7 +163,7 @@ const FoodDetails: React.FC = () => {
         />
       ),
     });
-  }, [navigation, favoriteIconName, toggleFavorite]);
+  }, [navigation, favoriteIconName]);
 
   return (
     <Container>
@@ -184,20 +196,10 @@ const FoodDetails: React.FC = () => {
                 onPress={handleDecrementFood}
                 testID="decrement-food"
               />
-              <AdittionalItemText testID="food-quantity">
-                {foodQuantity}
-              </AdittionalItemText>
-              <Icon
-                size={15}
-                color="#6C6C80"
-                name="plus"
-                onPress={handleIncrementFood}
-                testID="increment-food"
-              />
             </QuantityContainer>
           </PriceButtonContainer>
 
-          <FinishOrderButton onPress={() => handleFinishOrder()}>
+          <FinishOrderButton onPress={handlePress}>
             <ButtonText>Confirmar pedido</ButtonText>
             <IconContainer>
               <Icon name="check-square" size={24} color="#fff" />

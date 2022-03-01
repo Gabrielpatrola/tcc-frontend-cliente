@@ -5,6 +5,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Feather';
 import Dashboard from '../pages/Dashboard';
 import Favorites from '../pages/Favorites';
+import Checkout from '../pages/Checkout/index';
+
 import Orders from '../pages/Orders';
 
 const Tab = createBottomTabNavigator();
@@ -47,12 +49,12 @@ const TabRoutes: React.FC = () => (
       name="Favorites"
       options={{
         tabBarIcon: ({ color }) => (
-          <Icon size={25} name="heart" color={color} />
+          <Icon size={25} name="shopping-cart" color={color} />
         ),
-        title: 'Favoritos',
+        title: 'Checkout',
         headerShown: false,
       }}
-      component={Favorites}
+      component={Checkout}
     />
   </Tab.Navigator>
 );
