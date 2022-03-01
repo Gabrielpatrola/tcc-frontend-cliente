@@ -1,70 +1,42 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-shadow */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useContext, useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import TabRoutes from './tab.routes';
+import auth from '@react-native-firebase/auth';
 
-import Home from '../pages/Home';
-import FoodDetails from '../pages/FoodDetails';
+import { AuthContext } from './AuthProvider';
+import AuthStack from './AuthStack';
+import HomeStack from './HomeStack';
 
-const App = createStackNavigator();
+const AppRoutes: React.FC = () => {
+  const { user, setUser } = useContext(AuthContext);
+  const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(true);
 
-const AppRoutes: React.FC = () => (
-  <NavigationContainer>
-    <App.Navigator initialRouteName="Home">
-      <App.Screen
-        options={{
-          cardStyle: { backgroundColor: '#C72828' },
-          headerShown: false,
-        }}
-        name="Home"
-        component={Home}
-      />
-      <App.Screen
-        name="MainBottom"
-        component={TabRoutes}
-        options={{
-          headerShown: false,
-          gestureEnabled: false,
-        }}
-      />
-      <App.Screen
-        name="FoodDetails"
-        component={FoodDetails}
-        options={({ navigation }) => ({
-          headerLeft: () => (
-            <Icon
-              name="arrow-left"
-              size={24}
-              color="#FFB84D"
-              onPress={() => navigation.goBack()}
-            />
-          ),
-          headerLeftContainerStyle: {
-            marginLeft: 24,
-          },
-          headerRight: () => <Icon name="heart" size={24} color="#FFB84D" />,
-          headerRightContainerStyle: {
-            marginRight: 24,
-          },
-          headerTitle: 'Prato - Massas',
-          headerTitleStyle: {
-            color: '#fff',
-            fontFamily: 'Poppins-Regular',
-            fontSize: 16,
-          },
-          headerStyle: {
-            backgroundColor: '#C72828',
-            elevation: 0,
-            borderWidth: 0,
-            shadowColor: 'transparent',
-          },
-        })}
-      />
-    </App.Navigator>
-  </NavigationContainer>
-);
+  // Handle user state changes
+  function onAuthStateChanged(user: any) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+
+  /*   if (loading) {
+    return <Loading />;
+  }
+   */
+  return (
+    <NavigationContainer>
+      {user ? <HomeStack /> : <AuthStack />}
+    </NavigationContainer>
+  );
+};
 
 export default AppRoutes;

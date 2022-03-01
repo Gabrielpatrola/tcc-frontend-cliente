@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 /* eslint-disable import/no-dynamic-require */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Image, ScrollView, Alert } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -10,6 +10,8 @@ import firestore from '@react-native-firebase/firestore';
 import Logo from '../../assets/logo-header.png';
 import SearchInput from '../../components/SearchInput';
 import formatValue from '../../utils/formatValue';
+
+import { AuthContext } from '../../routes/AuthProvider';
 
 import {
   Container,
@@ -60,6 +62,7 @@ const Dashboard: React.FC = () => {
   async function handleNavigate(id: number | string): Promise<void> {
     navigation.navigate('FoodDetails', { id });
   }
+  const { user, logout } = useContext(AuthContext);
 
   useEffect(() => {
     async function loadFoods(): Promise<void> {
@@ -152,7 +155,7 @@ const Dashboard: React.FC = () => {
           name="log-out"
           size={24}
           color="#FFB84D"
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => logout()}
         />
       </Header>
       <FilterContainer>
