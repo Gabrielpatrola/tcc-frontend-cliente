@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
   async function handleNavigate(id: number | string): Promise<void> {
     navigation.navigate('FoodDetails', { id });
   }
-  const { user, logout } = useContext(AuthContext);
+  const { logout } = useContext(AuthContext);
 
   useEffect(() => {
     async function loadFoods(): Promise<void> {

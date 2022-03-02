@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import React, {
   useEffect,
@@ -100,14 +101,13 @@ const FoodDetails: React.FC = () => {
   }, [routeParams]);
 
   const handlePress = async () => {
-    /*     setLoading(true); */
     try {
       await addToCart(user, food.id as number, foodQuantity);
+      return Alert.alert('Adicionado com sucesso!');
     } catch (error) {
       console.log(error);
       Alert.alert('Something went wrong');
     }
-    /*     setLoading(false); */
   };
 
   function handleIncrementFood(): void {
@@ -135,15 +135,6 @@ const FoodDetails: React.FC = () => {
 
     return formatValue(foodPrice);
   }, [food, foodQuantity]);
-
-  /*   async function handleFinishOrder(): Promise<void> {
-    const newOrder = { ...food, product_id: food.id };
-    delete newOrder.id;
-
-    await api.post('/orders', newOrder);
-
-    navigation.goBack();
-  } */
 
   // Calculate the correct icon name
   const favoriteIconName = useMemo(

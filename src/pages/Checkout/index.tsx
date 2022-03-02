@@ -3,10 +3,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext } from 'react';
-import { Text, View, TouchableOpacity, FlatList } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { Text, View, TouchableOpacity, FlatList, Alert } from 'react-native';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+import { useNavigation } from '@react-navigation/native';
 import CartCard from '../../components/CartCard';
 import Loading from '../Loading';
 import Button from '../../components/Button';
@@ -19,11 +20,33 @@ import { createOrder, deleteCart } from '../../utils/FirestoreUtil';
 import checkoutStyles from './style';
 
 const Checkout: React.FC = () => {
+  const navigation = useNavigation();
   const { user } = useContext(AuthContext);
+  const [cartDisabled, setCartDisabled] = useState(false);
   const { list, price, cartLoading } = UseCart();
 
   const handleDeleteCart = async () => {
     return deleteCart(user.uid);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      setCartDisabled(true);
+      await createOrder(list, uuidv4().slice(0, 8), user, price as any);
+      setCartDisabled(false);
+
+      return Alert.alert('Pedido feito com sucesso!', 'tudo certo', [
+        {
+          text: 'Ok',
+          onPress: () => navigation.goBack(),
+        },
+      ]);
+    } catch (error) {
+      console.log(error);
+      setCartDisabled(false);
+
+      Alert.alert('Something went wrong');
+    }
   };
 
   const ListFooter = () => {
@@ -37,9 +60,8 @@ const Checkout: React.FC = () => {
         <View style={baseStyles.line} />
         <Button
           title="CHECK OUT"
-          onPress={() =>
-            createOrder(list, uuidv4().slice(0, 8), user, price as any)
-          }
+          onPress={() => handleCheckout()}
+          isLoading={cartDisabled}
         />
         <View
           style={{
