@@ -37,7 +37,9 @@ const Checkout: React.FC = () => {
         <View style={baseStyles.line} />
         <Button
           title="CHECK OUT"
-          onPress={() => createOrder(list, uuidv4(), user, price as any)}
+          onPress={() =>
+            createOrder(list, uuidv4().slice(0, 8), user, price as any)
+          }
         />
         <View
           style={{

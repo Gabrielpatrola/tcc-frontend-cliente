@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import React, { useEffect, useState, useContext } from 'react';
 import { Image } from 'react-native';
 
-import api from '../../services/api';
+import firestore from '@react-native-firebase/firestore';
 import formatValue from '../../utils/formatValue';
+import { AuthContext } from '../../routes/AuthProvider';
 
 import {
   Container,
@@ -29,16 +31,30 @@ interface Food {
 
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Food[]>([]);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    async function loadOrders(): Promise<void> {
-      const { data } = await api.get<Food[]>('/orders');
-      const foods = data.map(food => ({
-        ...food,
-        formattedValue: formatValue(food.price),
-      }));
+    async function loadOrders() {
+      try {
+        firestore()
+          .collection('orders')
+          .where('user_uid', '==', user.uid)
+          .onSnapshot(querySnapshot => {
+            const products: Food[] = [];
+            querySnapshot.forEach(documentSnapshot => {
+              products.push({
+                value: documentSnapshot.data().value,
+                description: documentSnapshot.data().status,
+                formattedValue: formatValue(documentSnapshot.data().amount),
+                id: documentSnapshot.id,
+              });
 
-      setOrders(foods);
+              setOrders(products);
+            });
+          });
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     loadOrders();
@@ -59,12 +75,17 @@ const Orders: React.FC = () => {
               <FoodImageContainer>
                 <Image
                   style={{ width: 88, height: 88 }}
-                  source={{ uri: item.thumbnail_url }}
+                  source={require('../../assets/5.jpeg')}
                 />
               </FoodImageContainer>
               <FoodContent>
-                <FoodTitle>{item.name}</FoodTitle>
-                <FoodDescription>{item.description}</FoodDescription>
+                <FoodTitle>Pedido #{item.id}</FoodTitle>
+                <FoodDescription>
+                  status:{' '}
+                  {item.description === 'Success'
+                    ? 'Finalizado'
+                    : 'Em andamento'}
+                </FoodDescription>
                 <FoodPricing>{item.formattedValue}</FoodPricing>
               </FoodContent>
             </Food>
