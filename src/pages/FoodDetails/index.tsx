@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import React, {
   useEffect,
   useState,
@@ -15,8 +16,6 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import formatValue from '../../utils/formatValue';
 
 import * as All from '../../assets/details';
-
-import api from '../../services/api';
 
 import {
   Container,
@@ -36,6 +35,7 @@ import {
   FinishOrderButton,
   ButtonText,
   IconContainer,
+  AdittionalItemText,
 } from './styles';
 
 import { addToCart } from '../../utils/FirestoreUtil';
@@ -102,7 +102,7 @@ const FoodDetails: React.FC = () => {
   const handlePress = async () => {
     /*     setLoading(true); */
     try {
-      await addToCart(user, food.id as number);
+      await addToCart(user, food.id as number, foodQuantity);
     } catch (error) {
       console.log(error);
       Alert.alert('Something went wrong');
@@ -196,11 +196,21 @@ const FoodDetails: React.FC = () => {
                 onPress={handleDecrementFood}
                 testID="decrement-food"
               />
+              <AdittionalItemText testID="food-quantity">
+                {foodQuantity}
+              </AdittionalItemText>
+              <Icon
+                size={15}
+                color="#6C6C80"
+                name="plus"
+                onPress={handleIncrementFood}
+                testID="decrement-food"
+              />
             </QuantityContainer>
           </PriceButtonContainer>
 
           <FinishOrderButton onPress={handlePress}>
-            <ButtonText>Confirmar pedido</ButtonText>
+            <ButtonText>Adicionar ao carrinho</ButtonText>
             <IconContainer>
               <Icon name="check-square" size={24} color="#fff" />
             </IconContainer>

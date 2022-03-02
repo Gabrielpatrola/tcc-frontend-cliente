@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Alert, Image } from 'react-native';
 import { Text, View, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import Button from '../Button';
 import baseStyles from '../../styles';
 import emptyCartStyles from './style';
@@ -8,6 +9,8 @@ import emptyCartStyles from './style';
 interface EmptyCartProps {}
 
 const EmptyCart = (props: EmptyCartProps) => {
+  const navigation = useNavigation();
+
   return (
     <ScrollView
       contentContainerStyle={[
@@ -20,12 +23,12 @@ const EmptyCart = (props: EmptyCartProps) => {
         source={require('../../assets/noCart.png')}
       />
       <Text style={[baseStyles.headerLg, emptyCartStyles.heading]}>
-        Your cart is empty :({' '}
+        Seu carrinho está vazio :({' '}
       </Text>
       <Button
         style={emptyCartStyles.button}
-        title="GO BACK HOME"
-        onPress={() => Alert.alert('goes back')}
+        title="Voltar"
+        onPress={() => navigation.goBack()}
       />
     </ScrollView>
   );
